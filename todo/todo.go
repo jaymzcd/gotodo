@@ -25,6 +25,11 @@ type TodoListItem struct {
     Created datastore.Time
 }
 
+type PageContext struct {
+    LogoutURL string
+    Items []TodoListItem
+}
+
 
 var fmap = template.FormatterMap{
     "date": Pretty,
@@ -40,15 +45,27 @@ func init() {
 }
 
 func root(w http.ResponseWriter, r *http.Request) {
-    
     c := appengine.NewContext(r)
-    q := datastore.NewQuery("TodoListItem").Order("-Created").Limit(10)
+    u := user.Current(c)
+
+    if u==nil {
+        w.Header().Set("Location", "/login")
+        w.WriteHeader(http.StatusFound)
+        return        
+    }
+
+    q := datastore.NewQuery("TodoListItem").Filter("Account=", u.Email).Order("-Created").Limit(10)
     items := make([]TodoListItem, 0, 10)
+
     if _, err := q.GetAll(c, &items); err != nil {
         http.Error(w, err.String(), http.StatusInternalServerError)
         return
     }
-    if err := todolistTemplate.Execute(w, items); err != nil {
+
+    logoutUrl, _ := user.LogoutURL(c, "/login")
+    context := PageContext{LogoutURL: logoutUrl, Items: items}
+    
+    if err := todolistTemplate.Execute(w, context); err != nil {
         http.Error(w, err.String(), http.StatusInternalServerError)
     }
 }
@@ -57,7 +74,7 @@ func login(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
     u := user.Current(c)
     if u == nil {
-        url, err := user.LoginURL(c, r.URL.String())
+        url, err := user.LoginURL(c, "/")
         if err != nil {
             http.Error(w, err.String(), http.StatusInternalServerError)
             return

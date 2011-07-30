@@ -1,6 +1,6 @@
 <html>
   <body>
-    {.repeated section @}
+    {.repeated section Items}
         {.section Account }
         <p><b>{@|html}</b> wrote:</p>
       {.or}
@@ -13,5 +13,6 @@
       <div><textarea name="item" rows="3" cols="60"></textarea></div>
       <div><input type="submit" value="Add item"></div>
     </form>
+    <a href="{LogoutURL}">Logout</a>
   </body>
 </html>
