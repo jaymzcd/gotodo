@@ -75,22 +75,4 @@ func createItem(w http.ResponseWriter, r *http.Request) {
     http.Redirect(w, r, "/", http.StatusFound)
 }
 
-var todolistTemplate = template.MustParse(todolistTemplateHTML, nil)
-const todolistTemplateHTML = `
-<html>
-  <body>
-    {.repeated section @}
-        {.section Account }
-        <p><b>{@|html}</b> wrote:</p>
-      {.or}
-        <p>An anonymous person wrote:</p>
-      {.end}
-      <pre>{Item|html}</pre>
-    {.end}
-    <form action="/create-item" method="post">
-      <div><textarea name="item" rows="3" cols="60"></textarea></div>
-      <div><input type="submit" value="Add item"></div>
-    </form>
-  </body>
-</html>
-`
+var todolistTemplate, _ = template.ParseFile("templates/index.html", nil)

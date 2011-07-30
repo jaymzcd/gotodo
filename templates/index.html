@@ -1,0 +1,16 @@
+<html>
+  <body>
+    {.repeated section @}
+        {.section Account }
+        <p><b>{@|html}</b> wrote:</p>
+      {.or}
+        <p>An anonymous person wrote:</p>
+      {.end}
+      <pre>{Item|html}</pre>
+    {.end}
+    <form action="/create-item" method="post">
+      <div><textarea name="item" rows="3" cols="60"></textarea></div>
+      <div><input type="submit" value="Add item"></div>
+    </form>
+  </body>
+</html>
