@@ -1,5 +1,12 @@
 package todo
 
+/* This is a todo app written in Go - code from learning the language
+ * from scratch and playing with appengine... I'm aiming to link it into
+ * a phonegap app also so I can have access to a common list that suits
+ * my needs between work, phone & home and maybe even thunderbird...
+ * ~jaymz
+ */
+
 import (
     "appengine"
     "appengine/user"
