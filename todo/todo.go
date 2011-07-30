@@ -13,26 +13,37 @@ import (
     "appengine/datastore"
     "fmt"
     "http"
+    "io" 
     "template"
     "time"
+    "log"
 )
 
-type TodoList struct {
+type TodoListItem struct {
     Account  string
     Item string
     Created datastore.Time
 }
 
+
+var fmap = template.FormatterMap{
+    "date": Pretty,
+}
+var todolistTemplate, _ = template.ParseFile("templates/index.html", fmap)
+
+
 func init() {
+    log.Print("Starting up!");
     http.HandleFunc("/", root)
     http.HandleFunc("/login", login)
     http.HandleFunc("/create-item", createItem)
 }
 
 func root(w http.ResponseWriter, r *http.Request) {
+    
     c := appengine.NewContext(r)
-    q := datastore.NewQuery("TodoList").Order("-Created").Limit(10)
-    items := make([]TodoList, 0, 10)
+    q := datastore.NewQuery("TodoListItem").Order("-Created").Limit(10)
+    items := make([]TodoListItem, 0, 10)
     if _, err := q.GetAll(c, &items); err != nil {
         http.Error(w, err.String(), http.StatusInternalServerError)
         return
@@ -60,14 +71,14 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 func createItem(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    g := TodoList{
+    g := TodoListItem{
         Item: r.FormValue("item"),
         Created:    datastore.SecondsToTime(time.Seconds()),
     }
     if u := user.Current(c); u != nil {
         g.Account = u.String()
     }
-    _, err := datastore.Put(c, datastore.NewIncompleteKey("TodoList"), &g)
+    _, err := datastore.Put(c, datastore.NewIncompleteKey("TodoListItem"), &g)
     if err != nil {
         http.Error(w, err.String(), http.StatusInternalServerError)
         return
@@ -75,4 +86,10 @@ func createItem(w http.ResponseWriter, r *http.Request) {
     http.Redirect(w, r, "/", http.StatusFound)
 }
 
-var todolistTemplate, _ = template.ParseFile("templates/index.html", nil)
+
+func Pretty(w io.Writer, s string, value ...interface{}) {
+        t := value[0].(datastore.Time)
+        tfmt := time.SecondsToLocalTime(int64(t)/1000000)
+        fmt.Fprint(w, tfmt)
+}
+
