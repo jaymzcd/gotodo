@@ -1,13 +1,9 @@
 <html>
   <body>
     {.repeated section Items}
-        {.section Account }
-        <p><b>{@|html}</b> wrote:</p>
-      {.or}
-        <p>An anonymous person wrote:</p>
-      {.end}
-      <pre>{Item|html}</pre>
-      <em>{Created|date}</em>
+      <p>{Item|html}
+      <em style="font-size:8px;">{Created|date}</em>
+      </p>
     {.end}
     <form action="/create-item" method="post">
       <div><textarea name="item" rows="3" cols="60"></textarea></div>

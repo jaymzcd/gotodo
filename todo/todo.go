@@ -54,7 +54,7 @@ func root(w http.ResponseWriter, r *http.Request) {
         return        
     }
 
-    q := datastore.NewQuery("TodoListItem").Filter("Account=", u.Email).Order("-Created").Limit(10)
+    q := datastore.NewQuery("TodoListItem").Filter("Account=", u.String()).Order("-Created").Limit(10)
     items := make([]TodoListItem, 0, 10)
 
     if _, err := q.GetAll(c, &items); err != nil {
