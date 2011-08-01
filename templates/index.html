@@ -1,10 +1,19 @@
 <html>
   <body>
+
+    {.repeated section Keys}
+    <form action="/delete-item" method="post">
+        <input type="hidden" name="key" value="{ @ }" />
+      <div><input type="submit" value="Delete { @ }"></div>
+    </form>
+    {.end }
+
     {.repeated section Items}
       <p>{Item|html}
       <em style="font-size:8px;">{Created|date}</em>
       </p>
     {.end}
+
     <form action="/create-item" method="post">
       <div><textarea name="item" rows="3" cols="60"></textarea></div>
       <div><input type="submit" value="Add item"></div>

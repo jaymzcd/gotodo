@@ -20,6 +20,7 @@ import (
 )
 
 type TodoListItem struct {
+    IntID int
     Account  string
     Item string
     Created datastore.Time
@@ -28,6 +29,7 @@ type TodoListItem struct {
 type PageContext struct {
     LogoutURL string
     Items []TodoListItem
+    Keys []*datastore.Key
 }
 
 
@@ -51,20 +53,21 @@ func root(w http.ResponseWriter, r *http.Request) {
     if u==nil {
         w.Header().Set("Location", "/login")
         w.WriteHeader(http.StatusFound)
-        return        
+        return
     }
 
     q := datastore.NewQuery("TodoListItem").Filter("Account=", u.String()).Order("-Created").Limit(10)
     items := make([]TodoListItem, 0, 10)
 
-    if _, err := q.GetAll(c, &items); err != nil {
+    keys, err := q.GetAll(c, &items)
+    if err != nil {
         http.Error(w, err.String(), http.StatusInternalServerError)
         return
     }
 
     logoutUrl, _ := user.LogoutURL(c, "/login")
-    context := PageContext{LogoutURL: logoutUrl, Items: items}
-    
+    context := PageContext{LogoutURL: logoutUrl, Items: items, Keys: keys}
+
     if err := todolistTemplate.Execute(w, context); err != nil {
         http.Error(w, err.String(), http.StatusInternalServerError)
     }
@@ -95,7 +98,8 @@ func createItem(w http.ResponseWriter, r *http.Request) {
     if u := user.Current(c); u != nil {
         g.Account = u.String()
     }
-    _, err := datastore.Put(c, datastore.NewIncompleteKey("TodoListItem"), &g)
+    key, err := datastore.Put(c, datastore.NewIncompleteKey("TodoListItem"), &g)
+    log.Print(key)
     if err != nil {
         http.Error(w, err.String(), http.StatusInternalServerError)
         return
