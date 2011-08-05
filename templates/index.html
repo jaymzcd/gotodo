@@ -1,20 +1,36 @@
 <html>
-  <body>
-
-    {.repeated section Items}
-      <p>{Item.Item|html}
-      <em style="font-size:8px;">{Item.Created|date}</em>
-      </p>
-    <form action="/delete-item" method="post">
-        <input type="hidden" name="key" value="{ Key|encode }" />
-      <div><input type="submit" value="Delete { Key|encode }"></div>
-    </form>
-    {.end }
-
-    <form action="/create-item" method="post">
-      <div><textarea name="item" rows="3" cols="60"></textarea></div>
-      <div><input type="submit" value="Add item"></div>
-    </form>
-    <a href="{LogoutURL}">Logout</a>
-  </body>
+    <head>
+        <title>Go To Do</title>
+        <script src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
+        <script src="/media/script.js"></script>
+        <link href='http://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
+        <link href="/media/styles.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div id="container">
+            <div class="todos">
+                {.repeated section Items}
+                <div class="todoItem">
+                    <div class="todoData">
+                        {Item.Item|html}
+                        <em style="font-size:8px;">{Item.Created|date}</em>
+                    </div>
+                    <div class="todoFunc">
+                        <form action="/delete-item" method="post">
+                            <input type="hidden" name="key" value="{ Key|encode }" />
+                            <input type="submit" value="X" />
+                        </form>
+                    </div>
+                </div>
+                {.end }
+            </div>
+            <div id="control">
+                <form action="/create-item" method="post">
+                    <input name="item" id="todoitem" />
+                    <input type="submit" value="Add item">
+                </form>
+                <a href="{LogoutURL}">Logout</a>
+            </div>
+        </div>
+    </body>
 </html>

@@ -1,0 +1,26 @@
+body {
+    font-family: 'Abel', sans;
+    font-size:26px;
+}
+
+#container {
+    margin:30px auto;
+    width:600px;
+}
+
+.todos {
+    width:400px;
+}
+.todoFunc, .todoData {
+    float:left;
+    display:inline-block;
+}
+.todoFunc {
+    float:right;
+}
+.todoItem {
+    clear:both;
+}
+#control {
+    clear:both;
+}
