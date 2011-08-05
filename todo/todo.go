@@ -35,6 +35,7 @@ type PageContext struct {
 
 var fmap = template.FormatterMap{
     "date": Pretty,
+    "encode": EncodeKey,
 }
 var todolistTemplate, _ = template.ParseFile("templates/index.html", fmap)
 
@@ -44,6 +45,7 @@ func init() {
     http.HandleFunc("/", root)
     http.HandleFunc("/login", login)
     http.HandleFunc("/create-item", createItem)
+    http.HandleFunc("/delete-item", deleteItem)
 }
 
 func root(w http.ResponseWriter, r *http.Request) {
@@ -86,7 +88,6 @@ func login(w http.ResponseWriter, r *http.Request) {
         w.WriteHeader(http.StatusFound)
         return
     }
-    fmt.Fprintf(w, "Hello, %v!", u)
 }
 
 func createItem(w http.ResponseWriter, r *http.Request) {
@@ -98,8 +99,7 @@ func createItem(w http.ResponseWriter, r *http.Request) {
     if u := user.Current(c); u != nil {
         g.Account = u.String()
     }
-    key, err := datastore.Put(c, datastore.NewIncompleteKey("TodoListItem"), &g)
-    log.Print(key)
+    _, err := datastore.Put(c, datastore.NewIncompleteKey("TodoListItem"), &g)
     if err != nil {
         http.Error(w, err.String(), http.StatusInternalServerError)
         return
@@ -107,10 +107,26 @@ func createItem(w http.ResponseWriter, r *http.Request) {
     http.Redirect(w, r, "/", http.StatusFound)
 }
 
+func deleteItem(w http.ResponseWriter, r *http.Request) {
+    c := appengine.NewContext(r)
+    log.Print(r.FormValue("key"))
+    key, _ := datastore.DecodeKey(r.FormValue("key"))
+    err := datastore.Delete(c, key)
+    if err != nil {
+        http.Error(w, err.String(), http.StatusInternalServerError)
+        return
+    }
+    http.Redirect(w, r, "/", http.StatusFound)
+}
 
 func Pretty(w io.Writer, s string, value ...interface{}) {
         t := value[0].(datastore.Time)
         tfmt := time.SecondsToLocalTime(int64(t)/1000000)
         fmt.Fprint(w, tfmt)
+}
+
+func EncodeKey(w io.Writer, s string, value ...interface{}) {
+        k := value[0].(*datastore.Key)
+        fmt.Fprint(w, k.Encode())
 }
 

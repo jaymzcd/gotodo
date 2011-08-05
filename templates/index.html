@@ -3,8 +3,8 @@
 
     {.repeated section Keys}
     <form action="/delete-item" method="post">
-        <input type="hidden" name="key" value="{ @ }" />
-      <div><input type="submit" value="Delete { @ }"></div>
+        <input type="hidden" name="key" value="{ @|encode }" />
+      <div><input type="submit" value="Delete { @|encode }"></div>
     </form>
     {.end }
 
