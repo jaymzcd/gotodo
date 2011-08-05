@@ -26,10 +26,14 @@ type TodoListItem struct {
     Created datastore.Time
 }
 
+type TodoItem struct {
+    Item TodoListItem
+    Key *datastore.Key
+}
+
 type PageContext struct {
     LogoutURL string
-    Items []TodoListItem
-    Keys []*datastore.Key
+    Items []TodoItem
 }
 
 
@@ -67,8 +71,14 @@ func root(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    todolist := make([]TodoItem, 0, 10)
+
+    for idx, _ := range items {
+        todolist = append(todolist, TodoItem{ Item: items[idx], Key: keys[idx] })
+    }
+
     logoutUrl, _ := user.LogoutURL(c, "/login")
-    context := PageContext{LogoutURL: logoutUrl, Items: items, Keys: keys}
+    context := PageContext{LogoutURL: logoutUrl, Items: todolist}
 
     if err := todolistTemplate.Execute(w, context); err != nil {
         http.Error(w, err.String(), http.StatusInternalServerError)

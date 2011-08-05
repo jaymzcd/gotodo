@@ -1,18 +1,15 @@
 <html>
   <body>
 
-    {.repeated section Keys}
+    {.repeated section Items}
+      <p>{Item.Item|html}
+      <em style="font-size:8px;">{Item.Created|date}</em>
+      </p>
     <form action="/delete-item" method="post">
-        <input type="hidden" name="key" value="{ @|encode }" />
-      <div><input type="submit" value="Delete { @|encode }"></div>
+        <input type="hidden" name="key" value="{ Key|encode }" />
+      <div><input type="submit" value="Delete { Key|encode }"></div>
     </form>
     {.end }
-
-    {.repeated section Items}
-      <p>{Item|html}
-      <em style="font-size:8px;">{Created|date}</em>
-      </p>
-    {.end}
 
     <form action="/create-item" method="post">
       <div><textarea name="item" rows="3" cols="60"></textarea></div>
